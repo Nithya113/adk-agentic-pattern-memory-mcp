@@ -1,5 +1,6 @@
 # agents/trip_agent.py
 from google.adk.agents import Agent
+from google.adk.models.lite_llm import LiteLlm
 from toolbox_core import ToolboxSyncClient
 from dotenv import load_dotenv
 
@@ -16,7 +17,7 @@ tools = toolbox.load_toolset('trip-planner-tools')
 
 # Define the Trip Agent
 root_agent = Agent(
-    model='gemini-flash-latest',
+    model=LiteLlm(model="openai/llama3.2:latest"),
     name='trip_planner_agent',
     description='Agent that helps users plan trips by finding destinations.',
     instruction="""

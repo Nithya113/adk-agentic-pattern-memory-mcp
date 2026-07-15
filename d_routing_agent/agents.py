@@ -1,5 +1,5 @@
 from google.adk.agents import Agent
-from google.adk.tools import google_search
+from google.adk.models.lite_llm import LiteLlm
 from google.adk.agents import Agent, SequentialAgent
 import sys
 import os
@@ -16,7 +16,7 @@ load_dotenv()
 # --- Agent Definitions for our Specialist Team (Refactored for Sequential Workflow) ---
 day_trip_agent = Agent(
     name="day_trip_agent",
-    model="gemini-flash-latest",
+    model=LiteLlm(model="openai/llama3.2:latest"),
     description="Agent specialized in generating spontaneous full-day itineraries based on mood, interests, and budget.",
     instruction="""
     You are the "Spontaneous Day Trip" Generator 🚗 - a specialized AI assistant that creates engaging full-day itineraries.
@@ -32,15 +32,15 @@ day_trip_agent = Agent(
 
     RETURN itinerary in MARKDOWN FORMAT with clear time blocks and specific venue names.
     """,
-    tools=[google_search]
+    tools=[]
 )
 
 # ✨ CHANGE 1: We tell foodie_agent to save its output to the shared state.
 # Note the new `output_key` and the more specific instruction.
 foodie_agent = Agent(
     name="foodie_agent",
-    model="gemini-flash-latest",
-    tools=[google_search],
+    model=LiteLlm(model="openai/llama3.2:latest"),
+    tools=[],
     instruction="""You are an expert food critic. Your goal is to find the best restaurant based on a user's request.
 
     When you recommend a place, you must output *only* the name of the establishment and nothing else.
@@ -53,8 +53,8 @@ foodie_agent = Agent(
 # The `{destination}` placeholder is automatically filled by the ADK from the state.
 transportation_agent = Agent(
     name="transportation_agent",
-    model="gemini-flash-latest",
-    tools=[google_search],
+    model=LiteLlm(model="openai/llama3.2:latest"),
+    tools=[],
     instruction="""You are a navigation assistant. Given a destination, provide clear directions.
     The user wants to go to: {destination}.
 
@@ -73,8 +73,8 @@ find_and_navigate_agent = SequentialAgent(
 
 weekend_guide_agent = Agent(
     name="weekend_guide_agent",
-    model="gemini-flash-latest",
-    tools=[google_search],
+    model=LiteLlm(model="openai/llama3.2:latest"),
+    tools=[],
     instruction="You are a local events guide. Your task is to find interesting events, concerts, festivals, and activities happening on a specific weekend."
 )
 
@@ -128,7 +128,7 @@ Now, analyze the user's request and orchestrate the correct agent.
 # We update the router to know about our new, powerful SequentialAgent.
 router_agent = Agent(
     name="router_agent",
-    model="gemini-flash-latest",
+    model=LiteLlm(model="openai/llama3.2:latest"),
     instruction=new_router_instruction,
     sub_agents=[weekend_guide_workflow, day_trip_workflow, find_and_navigate_agent, iterative_planner_agent, parallel_planner_agent, custom_agent],
 )
