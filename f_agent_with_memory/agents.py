@@ -4,9 +4,10 @@ import os
 
 # Import ADK components
 from google.adk.agents import LlmAgent, BaseAgent
+from google.adk.models.lite_llm import LiteLlm
 from google.adk.events import Event
 from google.adk.agents.invocation_context import InvocationContext
-from google.adk.tools import ToolContext, google_search
+from google.adk.tools import ToolContext
 from google.adk.tools.agent_tool import AgentTool
 from typing_extensions import override
 from dotenv import load_dotenv
@@ -49,20 +50,20 @@ def recall_user_preferences(tool_context: ToolContext) -> Dict[str, Any]:
 # --- 2. Define the Specialist "Tool" Agent ---
 planner_tool_agent = LlmAgent(
     name="PlannerToolAgent",
-    model="gemini-flash-latest",
+    model=LiteLlm(model="openai/llama3.2:latest"),
     description="A specialist that finds activities and restaurants based on a user's request and preferences.",
     instruction="""
     You are a planning assistant. Based on the user's request and their provided preferences, find one activity and one restaurant in Sunnyvale.
     Output the plan as a simple JSON object.
     Example: {"activity": "The Tech Interactive", "restaurant": "Il Postale"}
     """,
-    tools=[google_search]
+    tools=[]
 )
 
 # --- 3. Define the Main Coordinator Agent ---
 root_agent = LlmAgent(
     name="MemoryCoordinatorAgent",
-    model="gemini-flash-latest",
+    model=LiteLlm(model="openai/llama3.2:latest"),
     instruction="""
     You are a highly intelligent, personalized trip planner with a persistent memory.
     1. RECALL FIRST: At the absolute beginning of the conversation, your first action MUST be to call the `recall_user_preferences` tool.
